@@ -1,1 +1,23 @@
+spring:
+  profiles:
+    active: local
+  jpa:
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 10MB
 
+---
+spring:
+  profiles: local
+  datasource:
+    platform: h2
+    url: jdbc:h2:~/h2/employee-management
+
+---
+spring:
+  profiles: test
+  datasource:
+    platform: h2
+    generate-unique-name: true

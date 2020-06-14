@@ -1,0 +1,1 @@
+insert into employees values ('e0001', 'hpotter', 'Harry Potter', 1234.00);
