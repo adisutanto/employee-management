@@ -18,12 +18,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EmployeeRestControllerTest {
+public class EmployeeUploadIntegTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -109,6 +113,23 @@ public class EmployeeRestControllerTest {
         assertThat(employee.getLogin()).isEqualTo("cushanpan");
         assertThat(employee.getName()).isEqualTo("麤羴攀");
         assertThat(employee.getSalary()).isEqualTo(new BigDecimal("0.01"));
+    }
+
+    @DirtiesContext
+    @Test
+    public void whenConcurrent() throws Exception {
+        Callable<ResponseEntity<String>> task = () -> {
+            return upload("employees.csv");
+        };
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<ResponseEntity<String>> future1 = executor.submit(task);
+        Future<ResponseEntity<String>> future2 = executor.submit(task);
+        ResponseEntity<String> response1 = future1.get();
+        ResponseEntity<String> response2 = future2.get();
+        assertThat(response1.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        assertThat(response2.getStatusCode()).isEqualByComparingTo(HttpStatus.BAD_REQUEST);
+        assertThat(response2.getBody()).contains("ConstraintViolationException");
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "employees")).isEqualTo(3);
     }
 
 }

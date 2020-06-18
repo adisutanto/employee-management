@@ -13,7 +13,34 @@ java -jar build/libs/employee-management-0.0.1-SNAPSHOT.jar
 
 ## Design
 
-### Functional
+### Non-Functional Design
+
+#### Performance
+
+To increase performance, we applied database indexes to all the sort columns.
+`id` column is primary key, `login` column is unique, so we added non-unique indexes each to `name`, and `salary` columns.
+
+To further increase performance, we can do JDBC batch insert and batch update or use Spring Batch (not yet implemented) instead of JPA `save` method.
+
+#### Concurrent csv upload
+
+Each csv upload operation is scoped with database transaction.
+When uploading the same csv concurrently, the first one will be successful, the second one will encounter database constraint violation. 
+
+#### Production-ready features
+
+We use Spring Boot Actuator to enable production-ready features.
+Features example: health check, monitoring, logging, metrics, etc.
+
+#### High availability
+
+This application could be deployed to Kubernetes or OpenShift platform, with at least 2 replicas to achieve high availability.
+
+### Functional Design
+
+#### UTF-8
+
+Default encoding is utf-8.
 
 #### Salary decimal places
 
