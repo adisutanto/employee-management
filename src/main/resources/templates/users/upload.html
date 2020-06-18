@@ -1,4 +1,6 @@
-<html xmlns:th="https://www.thymeleaf.org">
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header"></head>
 <body>
 
 <div th:if="${message}">
@@ -21,4 +23,5 @@
 </div>
 
 </body>
+<div lang="en" th:replace="fragments/footer :: footer"></div>
 </html>

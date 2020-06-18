@@ -8,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,6 +16,8 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -95,6 +98,17 @@ public class EmployeeRestControllerTest {
         ResponseEntity<String> response = upload("employees.csv");
         assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "employees")).isEqualTo(3);
+        String sql = "SELECT * FROM employees WHERE id = ?";
+        // Verify update is correct
+        Employee employee = jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Employee.class), "e0001");
+        assertThat(employee.getLogin()).isEqualTo("rwesley");
+        assertThat(employee.getName()).isEqualTo("Ron Weasley");
+        assertThat(employee.getSalary()).isEqualTo(new BigDecimal("19234.50"));
+        // Verify insert is correct
+        employee = jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Employee.class), "e0011");
+        assertThat(employee.getLogin()).isEqualTo("cushanpan");
+        assertThat(employee.getName()).isEqualTo("麤羴攀");
+        assertThat(employee.getSalary()).isEqualTo(new BigDecimal("0.01"));
     }
 
 }

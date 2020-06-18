@@ -1,6 +1,12 @@
 spring:
   profiles:
     active: local
+  data:
+    rest:
+      default-page-size: 30
+      limit-param-name: limit
+      max-page-size: 30
+      page-param-name: offset
   jpa:
     open-in-view: false
   servlet:
